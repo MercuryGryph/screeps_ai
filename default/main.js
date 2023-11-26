@@ -45,7 +45,8 @@ function keepCreepNumber(spawn, type, role, number) {
 }
 
 function showInfo() {
-    for (const spawn of Game.spawns) {
+    for (const name in Game.spawns) {
+        spawn = Game.spawns[name];
         if (spawn.spawning) {
             const spawningTarget = Game.creeps[spawn.spawning.name];
             spawn.room.visual.text(
@@ -58,7 +59,8 @@ function showInfo() {
 }
 
 function arrangeWork() {
-    for (const creep of Game.creeps) {
+    for (const name in Game.creeps) {
+        creep = Game.creeps[name];
         switch (creep.memory[Contents.Memory.Role]) {
             case Contents.Role.Harvester:
                 roleHarvester.run(creep);
