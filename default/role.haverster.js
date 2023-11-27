@@ -16,13 +16,6 @@ run: function (creep) {
                 const flag = Game.flags[creep.room.name + Contents.FlagRole.Counter];
                 const numHaverster = flag.memory[source.id];
 
-                // const numHaverster = _.filter(
-                //     Game.creeps,
-                //     (creep) =>
-                //         creep.memory[Contents.CreepMemory.Role] === Contents.CreepRole.Harvester &&
-                //         creep.memory[Contents.CreepMemory.WorkTarget] === source.id
-                // ).length;
-
                 if (source.energy > 0 && numHaverster < Contents.Number.SourceHaversterMax) {
                     creep.memory[Contents.CreepMemory.WorkTarget] = source.id;
                     break;
@@ -30,11 +23,8 @@ run: function (creep) {
             }
         }
 
-        const source = Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget]);
-        if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
-            creep.moveTo(source, {
-                visualizePathStyle: {stroke: '#ffaa00'}});
-        }
+        RoleCommom.harvestTarget(creep);
+
     } else {
         if (RoleCommom.transEnergyToSpawn(creep)) {
             // return

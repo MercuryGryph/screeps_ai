@@ -1,5 +1,6 @@
 const Contents = require('contents')
 const roleHarvester = require('role.haverster')
+const roleUpgrader = require('role.upgrader')
 
 const BasicCreepBody = [WORK, CARRY, MOVE];
 const Creep3W1C2M = [WORK, WORK, WORK, CARRY, MOVE];
@@ -61,19 +62,14 @@ function cleanMemory() {
  * @param {number} number
  */
 function keepCreepNumber(spawn, type, role, number) {
-    // const creepsNum = _.filter(
-    //     spawn.room.find(FIND_MY_CREEPS),
-    //     (creep) =>
-    //         creep.memory[Contents.CreepMemory.Role] === role
-    // ).length;
 
     const creepsNum = spawn.room.find(FIND_MY_CREEPS, {
         filter: (creep) => {
             return creep.memory[Contents.CreepMemory.Role] === role
-        }
-    }).length;
+        }}).length;
 
     if (creepsNum < number) {
+        console.log(Game.time + ' | number of ' + role + ' is ' + creepsNum);
         const Memory = {memory: {}};
         Memory.memory[Contents.CreepMemory.Role] = role;
         spawn.spawnCreep(
@@ -103,8 +99,12 @@ function arrangeWork() {
                 case Contents.CreepRole.Harvester:
                     roleHarvester.run(creep);
                     break;
+                case Contents.CreepRole.Upgrader:
+                    roleUpgrader.run(creep);
+                    break;
                 default:
                     console.log(
+                        Game.time + ' | ' +
                         creep.name + ' has role \" ' + creep.memory[Contents.CreepMemory.Role] +
                         ' \", which did not know what to do.')
             }
@@ -121,6 +121,8 @@ module.exports.loop = function () {
     arrangeWork();
 
     for (const spawn of RoomMainSpawnList) {
+        keepCreepNumber(
+            spawn, BasicCreepBody, Contents.CreepRole.Upgrader, Contents.Number.UpgraderNeeded);
         keepCreepNumber(spawn, HarvesterBody, Contents.CreepRole.Harvester, Contents.Number.HaversterNeeded);
         updateFlagMemory(spawn);
     }

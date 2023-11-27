@@ -1,10 +1,12 @@
-const Contents = {
+const Contents= {
     CreepMemory: {
         WorkTarget: 'workTarget',
-        Role: 'role'
+        Role: 'role',
+        ShouldGetEnergy: 'shouldGetEnergy'
     },
     CreepRole: {
         Harvester: 'harvester',
+        Upgrader: 'upgrader',
         Builder: 'builder'
     },
     MainSpawnMemory: {
@@ -18,7 +20,8 @@ const Contents = {
     },
     Number: {
         SourceHaversterMax: 3,
-        HaversterNeeded: 6
+        HaversterNeeded: 6,
+        UpgraderNeeded: 2
     }
 }
 
