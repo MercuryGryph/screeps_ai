@@ -24,15 +24,13 @@ function updateFlagMemory(spawn) {
     const flag = Game.flags[spawn.room.name + Contents.FlagRole.Counter];
 
     for (const source of spawn.room.find(FIND_SOURCES)) {
-        flag.memory[source.id] = 0;
-    }
+        flag.memory[source.id] =
+            spawn.room.find(FIND_MY_CREEPS, {
+                filter: (creep) => {
+                    return (creep.memory[Contents.CreepMemory.WorkTarget] === source.id &&
+                            creep.memory[Contents.CreepMemory.Role] === Contents.CreepRole.Harvester)}}
+            ).length;
 
-    for (const creep of spawn.room.find(FIND_MY_CREEPS)) {
-        const id = creep.memory[Contents.CreepMemory.WorkTarget];
-        flag.memory[id] += 1;
-    }
-
-    for (const source of spawn.room.find(FIND_SOURCES)) {
         source.room.visual.text(
             flag.memory[source.id],
             source.pos.x + 0.6,
@@ -63,10 +61,11 @@ function cleanMemory() {
  */
 function keepCreepNumber(spawn, type, role, number) {
 
-    const creepsNum = spawn.room.find(FIND_MY_CREEPS, {
-        filter: (creep) => {
-            return creep.memory[Contents.CreepMemory.Role] === role
-        }}).length;
+    const creepsNum =
+        spawn.room.find(FIND_MY_CREEPS, {
+            filter: (creep) => {
+                return creep.memory[Contents.CreepMemory.Role] === role}}
+        ).length;
 
     if (creepsNum < number) {
         console.log(Game.time + ' | number of ' + role + ' is ' + creepsNum);
@@ -121,9 +120,16 @@ module.exports.loop = function () {
     arrangeWork();
 
     for (const spawn of RoomMainSpawnList) {
-        keepCreepNumber(
-            spawn, BasicCreepBody, Contents.CreepRole.Upgrader, Contents.Number.UpgraderNeeded);
-        keepCreepNumber(spawn, HarvesterBody, Contents.CreepRole.Harvester, Contents.Number.HaversterNeeded);
+        keepCreepNumber(spawn,
+            BasicCreepBody,
+            Contents.CreepRole.Upgrader,
+            Contents.Number.UpgraderNeeded);
+
+        keepCreepNumber(spawn,
+            HarvesterBody,
+            Contents.CreepRole.Harvester,
+            Contents.Number.HaversterNeeded);
+
         updateFlagMemory(spawn);
     }
 }
