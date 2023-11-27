@@ -2,11 +2,26 @@ const Contents = require('contents')
 const roleHarvester = require('role.haverster')
 
 const BasicCreepBody = [WORK, CARRY, MOVE];
+const Creep3W1C2M = [WORK, WORK, WORK, CARRY, MOVE];
 
-const HarvesterNumber = 5;
-const HarvesterBody = BasicCreepBody;
+let HarvesterBody = BasicCreepBody;
 
 const MainSpawn = Game.spawns['spawner_1'];
+let RoomMainSpawnList = [MainSpawn]
+
+/**
+ * @param {StructureSpawn} spawn
+ */
+function updateFlagMemory(spawn) {
+    let flag = undefined;
+    if (Game.flags[spawn.room.name + Contents.FlagRole.Counter]) {
+        // TODO
+    }
+
+    // for (const creep of spawn.room.find(FIND_MY_CREEPS)) {
+    //     const
+    // }
+}
 
 function cleanMemory() {
 
@@ -15,11 +30,11 @@ function cleanMemory() {
             delete Memory.creeps[name]
         }
     }
-    for (const name in Memory.spawns) {
-        if (!Game.spawns[name]) {
-            delete Memory.spawns[name]
-        }
-    }
+    // for (const name in Memory.spawns) {
+    //     if (!Game.spawns[name]) {
+    //         delete Memory.spawns[name]
+    //     }
+    // }
 }
 
 /**
@@ -29,28 +44,34 @@ function cleanMemory() {
  * @param {number} number
  */
 function keepCreepNumber(spawn, type, role, number) {
-    const creeps = _.filter(
-        Game.creeps,
-        (creep) =>
-            creep.memory[Contents.Memory.Role] === role &&
-            creep.room === spawn.room
-    );
-    if (creeps.length < number) {
+    // const creepsNum = _.filter(
+    //     spawn.room.find(FIND_MY_CREEPS),
+    //     (creep) =>
+    //         creep.memory[Contents.CreepMemory.Role] === role
+    // ).length;
+
+    const creepsNum = spawn.room.find(FIND_MY_CREEPS, {
+        filter: (creep) => {
+            return creep.memory[Contents.CreepMemory.Role] === role
+        }
+    }).length;
+
+    if (creepsNum < number) {
+        const Memory = {memory: {}};
+        Memory.memory[Contents.CreepMemory.Role] = role;
         spawn.spawnCreep(
             type,
-            role + spawn.name + Game.time,
-            {memory: {
-                role: role}});
+            role + '-' + spawn.name + '-' + Game.time,
+            Memory)
     }
 }
 
 function showInfo() {
-    for (const name in Game.spawns) {
-        spawn = Game.spawns[name];
+    for (const spawn of _.filter(Game.spawns)) {
         if (spawn.spawning) {
             const spawningTarget = Game.creeps[spawn.spawning.name];
             spawn.room.visual.text(
-                'x ' + spawningTarget.memory[Contents.Memory.Role],
+                '+ ' + spawningTarget.memory[Contents.CreepMemory.Role],
                 spawn.pos.x+1,
                 spawn.pos.y,
                 {align: 'left', opacity: 0.8});
@@ -59,14 +80,17 @@ function showInfo() {
 }
 
 function arrangeWork() {
-    for (const name in Game.creeps) {
-        creep = Game.creeps[name];
-        switch (creep.memory[Contents.Memory.Role]) {
-            case Contents.Role.Harvester:
-                roleHarvester.run(creep);
-                break;
-            default:
-                console.error(creep.name + ' has role \" ' + creep.memory[Contents.Memory.Role] + ' \", which did not know what to do.')
+    for (const spawn of _.filter(Game.spawns)) {
+        for (const creep of spawn.room.find(FIND_MY_CREEPS)) {
+            switch (creep.memory[Contents.CreepMemory.Role]) {
+                case Contents.CreepRole.Harvester:
+                    roleHarvester.run(creep);
+                    break;
+                default:
+                    console.log(
+                        creep.name + ' has role \" ' + creep.memory[Contents.CreepMemory.Role] +
+                        ' \", which did not know what to do.')
+            }
         }
     }
 }
@@ -75,7 +99,9 @@ module.exports.loop = function () {
 
     cleanMemory();
 
-    keepCreepNumber(MainSpawn, HarvesterBody, Contents.Role.Harvester, HarvesterNumber);
+    for (const spawn of RoomMainSpawnList) {
+        keepCreepNumber(spawn, HarvesterBody, Contents.CreepRole.Harvester, Contents.Number.HaversterNeeded);
+    }
 
     showInfo();
 

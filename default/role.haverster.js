@@ -1,4 +1,5 @@
-const Contents = require('contents')
+const Contents = require('contents');
+const RoleCommom = require('role.common');
 
 const roleHaverster = {
 
@@ -7,42 +8,35 @@ run: function (creep) {
 
     if (creep.store.getFreeCapacity() > 0) {
 
-        if (!creep.memory[Contents.Memory.WorkTarget] ||
-            Game.getObjectById(creep.memory[Contents.Memory.WorkTarget]).energy === 0) {
+        if (!creep.memory[Contents.CreepMemory.WorkTarget] ||
+            Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget]).energy === 0) {
             const sources = creep.room.find(FIND_SOURCES);
 
             for (const source of sources) {
                 const numHaverster = _.filter(
                     Game.creeps,
                     (creep) =>
-                        creep.memory[Contents.Memory.Role] === Contents.Role.Harvester &&
-                        creep.memory[Contents.Memory.WorkTarget] === source.id
+                        creep.memory[Contents.CreepMemory.Role] === Contents.CreepRole.Harvester &&
+                        creep.memory[Contents.CreepMemory.WorkTarget] === source.id
                 ).length;
 
-                if (source.energy > 0 && numHaverster < 4) {
-                    creep.memory[Contents.Memory.WorkTarget] = source.id;
+                if (source.energy > 0 && numHaverster < Contents.Number.SourceHaversterMax) {
+                    creep.memory[Contents.CreepMemory.WorkTarget] = source.id;
                     break;
                 }
             }
         }
 
-        const source = Game.getObjectById(creep.memory[Contents.Memory.WorkTarget]);
+        const source = Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget]);
         if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
             creep.moveTo(source, {
                 visualizePathStyle: {stroke: '#ffaa00'}});
         }
     } else {
-        const targets = creep.room.find(FIND_MY_STRUCTURES, {
-            filter: (structure) => {
-                return (structure.structureType === STRUCTURE_SPAWN ||
-                        structure.structureType === STRUCTURE_EXTENSION) &&
-                    structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;}});
-        if (targets.length > 0) {
-            if (creep.transfer(targets[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(targets[0], {
-                    visualizePathStyle: {stroke: '#ffffff'}})
-            }
+        if (RoleCommom.transEnergyToSpawn(creep)) {
+            // return
         }
+        // TODO 其他可行的工作
     }
 
 }
