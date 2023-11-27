@@ -13,12 +13,15 @@ run: function (creep) {
             const sources = creep.room.find(FIND_SOURCES);
 
             for (const source of sources) {
-                const numHaverster = _.filter(
-                    Game.creeps,
-                    (creep) =>
-                        creep.memory[Contents.CreepMemory.Role] === Contents.CreepRole.Harvester &&
-                        creep.memory[Contents.CreepMemory.WorkTarget] === source.id
-                ).length;
+                const flag = Game.flags[creep.room.name + Contents.FlagRole.Counter];
+                const numHaverster = flag.memory[source.id];
+
+                // const numHaverster = _.filter(
+                //     Game.creeps,
+                //     (creep) =>
+                //         creep.memory[Contents.CreepMemory.Role] === Contents.CreepRole.Harvester &&
+                //         creep.memory[Contents.CreepMemory.WorkTarget] === source.id
+                // ).length;
 
                 if (source.energy > 0 && numHaverster < Contents.Number.SourceHaversterMax) {
                     creep.memory[Contents.CreepMemory.WorkTarget] = source.id;
@@ -36,7 +39,7 @@ run: function (creep) {
         if (RoleCommom.transEnergyToSpawn(creep)) {
             // return
         }
-        // TODO 其他可行的工作
+        // 其他可行的工作
     }
 
 }

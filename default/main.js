@@ -13,14 +13,31 @@ let RoomMainSpawnList = [MainSpawn]
  * @param {StructureSpawn} spawn
  */
 function updateFlagMemory(spawn) {
-    let flag = undefined;
-    if (Game.flags[spawn.room.name + Contents.FlagRole.Counter]) {
-        // TODO
+    if (!Game.flags[spawn.room.name + Contents.FlagRole.Counter]) {
+        spawn.room.createFlag(
+            spawn.pos.x + 1,
+            spawn.pos.y + 1,
+            spawn.room.name + Contents.FlagRole.Counter
+        );
+    }
+    const flag = Game.flags[spawn.room.name + Contents.FlagRole.Counter];
+
+    for (const source of spawn.room.find(FIND_SOURCES)) {
+        flag.memory[source.id] = 0;
     }
 
-    // for (const creep of spawn.room.find(FIND_MY_CREEPS)) {
-    //     const
-    // }
+    for (const creep of spawn.room.find(FIND_MY_CREEPS)) {
+        const id = creep.memory[Contents.CreepMemory.WorkTarget];
+        flag.memory[id] += 1;
+    }
+
+    for (const source of spawn.room.find(FIND_SOURCES)) {
+        source.room.visual.text(
+            flag.memory[source.id],
+            source.pos.x + 0.6,
+            source.pos.y
+        )
+    }
 }
 
 function cleanMemory() {
@@ -99,11 +116,12 @@ module.exports.loop = function () {
 
     cleanMemory();
 
-    for (const spawn of RoomMainSpawnList) {
-        keepCreepNumber(spawn, HarvesterBody, Contents.CreepRole.Harvester, Contents.Number.HaversterNeeded);
-    }
-
     showInfo();
 
     arrangeWork();
+
+    for (const spawn of RoomMainSpawnList) {
+        keepCreepNumber(spawn, HarvesterBody, Contents.CreepRole.Harvester, Contents.Number.HaversterNeeded);
+        updateFlagMemory(spawn);
+    }
 }

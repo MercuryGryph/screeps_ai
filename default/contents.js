@@ -12,14 +12,9 @@ const Contents = {
     },
     FlagMemory: {
         Role: 'role',
-        CountSourceCreeps: 'countSourceCreeps'
     },
     FlagRole: {
         Counter: 'counter'
-    },
-    FlagMemorySources: {
-        Id: 'id',
-        NumberCreeps: 'numberCreeps',
     },
     Number: {
         SourceHaversterMax: 3,
