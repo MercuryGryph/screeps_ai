@@ -1,7 +1,7 @@
 const Contents = require('contents')
-const roleHarvester = require('role.haverster')
-const roleUpgrader = require('role.upgrader')
-const roleBuilder = require('role.builder')
+const creepHarvester = require('creep.haverster')
+const creepUpgrader = require('creep.upgrader')
+const creepBuilder = require('creep.builder')
 
 const BasicCreepBody = [WORK, CARRY, MOVE, MOVE];
 const Creep3W1C2M = [WORK, WORK, WORK, CARRY, MOVE];
@@ -75,10 +75,14 @@ function keepCreepNumber(spawn, type, role, number) {
 
     if (creepsNum < number) {
         console.log(
-            Game.time +
-            ' | number of ' + role +
-            ' in room ' + spawn.room.name +
+            Game.time + ' | ' + spawn.room.name +
+            '\t | number of ' + role +
             ' is ' + creepsNum);
+        console.log(
+            Game.time + ' | ' + spawn.room.name +
+            '\t | spawn ' + spawn.name +
+            ' is spawning ' + role);
+
         const Memory = {memory: {}};
         Memory.memory[Contents.CreepMemory.Role] = role;
         spawn.spawnCreep(
@@ -92,9 +96,12 @@ function keepCreepNumber(spawn, type, role, number) {
 function showInfo() {
     for (const spawn of _.filter(Game.spawns)) {
         if (spawn.spawning) {
-            const spawningTarget = Game.creeps[spawn.spawning.name];
+            const spawningTarget = Game
+                .creeps[spawn.spawning.name]
+                .memory[Contents.CreepMemory.Role];
+
             spawn.room.visual.text(
-                '+ ' + spawningTarget.memory[Contents.CreepMemory.Role],
+                '+ ' + spawningTarget,
                 spawn.pos.x+1,
                 spawn.pos.y,
                 {align: 'left', opacity: 0.8});
@@ -107,13 +114,13 @@ function arrangeWork(spawn) {
     for (const creep of spawn.room.find(FIND_MY_CREEPS)) {
         switch (creep.memory[Contents.CreepMemory.Role]) {
             case Contents.CreepRole.Harvester:
-                roleHarvester.run(creep);
+                creepHarvester.run(creep);
                 break;
             case Contents.CreepRole.Upgrader:
-                roleUpgrader.run(creep);
+                creepUpgrader.run(creep);
                 break;
             case Contents.CreepRole.Builder:
-                roleBuilder.run(creep);
+                creepBuilder.run(creep);
                 break
             default:
                 console.log(

@@ -22,8 +22,8 @@ const Contents= {
     Number: {
         SourceHaversterMax: 2,
         HaversterNeeded: 4,
-        UpgraderNeeded: 3,
-        BuilderNeeded: 3
+        UpgraderNeeded: 2,
+        BuilderNeeded: 4
     }
 }
 

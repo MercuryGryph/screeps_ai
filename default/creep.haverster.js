@@ -1,15 +1,21 @@
 const Contents = require('contents');
-const RoleCommon = require('role.common');
+const CreepCommon = require('creep.common');
 
-const roleHaverster = {
+const creepHaverster = {
 
 /** @param {Creep} creep **/
 run: function (creep) {
 
-    if (creep.store.getFreeCapacity() > 0) {
+    if (creep.store.getUsedCapacity() === 0) {
+        creep.memory[Contents.CreepMemory.ShouldGetEnergy] = true;
+    } else if (creep.store.getFreeCapacity() === 0) {
+        creep.memory[Contents.CreepMemory.ShouldGetEnergy] = false;
+    }
+
+    if (creep.memory[Contents.CreepMemory.ShouldGetEnergy]) {
 
         if (!creep.memory[Contents.CreepMemory.WorkTarget] ||
-            RoleCommon.isTargetEmpty(creep, RESOURCE_ENERGY)) {
+            CreepCommon.isTargetEmpty(creep, RESOURCE_ENERGY)) {
             const sources = creep.room.find(FIND_SOURCES);
 
             for (const source of sources) {
@@ -24,15 +30,16 @@ run: function (creep) {
             }
         }
 
-        RoleCommon.getEnergyFromTarget(creep);
+        CreepCommon.getEnergyFromTarget(creep);
 
     } else {
-        if (RoleCommon.transEnergyToSpawn(creep)) {
-        } else if (RoleCommon.transEnergyToContainer(creep)) {
-        } else RoleCommon.toUpgradeController(creep)
+        if (CreepCommon.transEnergyToSpawn(creep)) {
+        } else if (CreepCommon.transEnergyToContainer(creep)) {
+        } else if (CreepCommon.toBuildConstruction(creep)){
+        } else CreepCommon.toUpgradeController(creep)
     }
 
 }
 }
 
-module.exports = roleHaverster
+module.exports = creepHaverster

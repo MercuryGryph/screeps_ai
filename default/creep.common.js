@@ -1,7 +1,7 @@
 // const Contents = require('contents');
 
 const Contents = require("./contents");
-const roleCommon = {
+const creepCommon = {
 
 /** @param {Creep} creep */
 setTargetAtContainer: function (creep) {
@@ -119,7 +119,7 @@ toUpgradeController: function (creep) {
 
     if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
         creep.moveTo(creep.room.controller, {
-                visualizePathStyle: {stroke: '#ffffff'}})
+                visualizePathStyle: {stroke: '#66ff66'}})
     }
 },
 
@@ -136,13 +136,17 @@ toBuildConstruction: function (creep) {
         creep.memory[Contents.CreepMemory.WorkTargetType] = FIND_MY_CONSTRUCTION_SITES;
     }
     const target = Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget]);
+    if (target == null) {   // 过程中目标已被完成
+        creep.memory[Contents.CreepMemory.WorkTarget] = undefined;
+        creep.memory[Contents.CreepMemory.WorkTargetType] = undefined;
+    }
     if (creep.build(target) === ERR_NOT_IN_RANGE) {
         creep.moveTo(target, {
-                visualizePathStyle: {stroke: '#ffffff'}});
+                visualizePathStyle: {stroke: '#2266ff'}});
     }
     return true;
 }
 
 }
 
-module.exports = roleCommon
+module.exports = creepCommon

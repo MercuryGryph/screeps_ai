@@ -1,7 +1,7 @@
 const Contents = require('contents');
-const RoleCommon = require("./role.common");
+const CreepCommon = require('creep.common')
 
-const roleBuilder = {
+const creepUpgrader = {
 
 /** @param {Creep} creep */
 run: function (creep) {
@@ -16,22 +16,19 @@ run: function (creep) {
         creep.memory[Contents.CreepMemory.WorkTargetType] = undefined;
 
         if (!creep.memory[Contents.CreepMemory.WorkTarget] ||
-            RoleCommon.isTargetEmpty(creep, RESOURCE_ENERGY)
+            CreepCommon.isTargetEmpty(creep, RESOURCE_ENERGY)
         ) {
-            if (RoleCommon.setTargetAtContainer(creep)) {
-            } else if (RoleCommon.setTargetAtSource(creep)) {
+            if (CreepCommon.setTargetAtContainer(creep)) {
+            } else if (CreepCommon.setTargetAtSource(creep)) {
             } // else if ...
         }
 
-        RoleCommon.getEnergyFromTarget(creep);
+        CreepCommon.getEnergyFromTarget(creep);
 
     } else {
-        if (RoleCommon.toBuildConstruction(creep)) {
-        } else if (RoleCommon.transEnergyToContainer(creep)) {
-        } else if (RoleCommon.transEnergyToSpawn(creep)) {
-        } else RoleCommon.toUpgradeController(creep)
+        CreepCommon.toUpgradeController(creep);
     }
 }
 }
 
-module.exports = roleBuilder
+module.exports = creepUpgrader;
