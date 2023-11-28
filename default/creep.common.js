@@ -25,8 +25,10 @@ setTargetAtSource: function (creep) {
     const sources = creep.room.find(FIND_SOURCES, {
         filter: (source) => {
             return (source.energy > 0);}});
+    const flag = Game.flags[creep.room.name + Contents.FlagRole.Counter];
+    const numHaverster = flag.memory[sources[0].id];
 
-    if (sources.length === 0) {
+    if (sources.length === 0 || numHaverster >= Contents.Number.SourceHaversterMax) {
         return false;
     }
     creep.memory[Contents.CreepMemory.WorkTarget] = sources[0].id;
@@ -54,20 +56,29 @@ isTargetEmpty: function (creep, type) {
     }
 },
 
-/** @param {Creep} creep */
-getEnergyFromTarget: function (creep) {
+/** @param {Creep} creep
+ * @param {any} type RESOURCE_*
+ */
+getEnergyFromTarget: function (creep, type = RESOURCE_ENERGY) {
 
-    const source = Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget]);
-    if (creep.harvest(source) === ERR_INVALID_TARGET) {
-        if (creep.withdraw(source, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-            creep.moveTo(source, {
-            visualizePathStyle: {stroke: '#ffaa00'}});
-        }
-        return
-    }
-    if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
-        creep.moveTo(source, {
-            visualizePathStyle: {stroke: '#ffaa00'}});
+    const target = Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget]);
+
+    switch (creep.memory[Contents.CreepMemory.WorkTargetType]) {
+        case STRUCTURE_CONTAINER:
+            if (creep.withdraw(target, type) === ERR_NOT_IN_RANGE) {
+                creep.moveTo(target, {
+                visualizePathStyle: {stroke: '#ffaa00'}});
+            }
+            break;
+        case FIND_SOURCES:
+            if (creep.harvest(target) === ERR_NOT_IN_RANGE) {
+                creep.moveTo(target, {
+                    visualizePathStyle: {stroke: '#ffaa00'}});
+            }
+            break
+        default:
+            creep.memory[Contents.CreepMemory.WorkTarget] = undefined;
+            creep.memory[Contents.CreepMemory.WorkTargetType] = undefined;
     }
 },
 
