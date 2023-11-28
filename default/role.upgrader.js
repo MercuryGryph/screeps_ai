@@ -13,19 +13,20 @@ run: function (creep) {
     }
 
     if (creep.memory[Contents.CreepMemory.ShouldGetEnergy]) {
-        if (!creep.memory[Contents.CreepMemory.WorkTarget] ||
-            Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget]).energy === 0) {
-            const sources = creep.room.find(FIND_SOURCES);
 
-            for (const source of sources) {
-                if (source.energy > 0) {
-                    creep.memory[Contents.CreepMemory.WorkTarget] = source.id;
-                    break;
-                }
+        if (!creep.memory[Contents.CreepMemory.WorkTarget] ||
+            Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget])
+                .energy === 0
+            // ||
+            // Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget])
+            //     .store.getUsedCapacity(RESOURCE_ENERGY) === 0
+            ) {
+            if (RoleCommon.setTargetAtContainer(creep)) {
+            } else if (RoleCommon.setTargetAtSource(creep)) {
             }
         }
 
-        RoleCommon.harvestTarget(creep);
+        RoleCommon.getEnergyFromTarget(creep);
 
     } else {
         RoleCommon.toUpgradeController(creep);

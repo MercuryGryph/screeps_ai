@@ -1,6 +1,7 @@
 const Contents= {
     CreepMemory: {
         WorkTarget: 'workTarget',
+        WorkTargetType: 'workTargetType',
         Role: 'role',
         ShouldGetEnergy: 'shouldGetEnergy'
     },
@@ -9,8 +10,8 @@ const Contents= {
         Upgrader: 'upgrader',
         Builder: 'builder'
     },
-    MainSpawnMemory: {
-        Sources: 'sources',
+    SpawnMemory: {
+        SpawningRole: 'spawningRole'
     },
     FlagMemory: {
         Role: 'role',
@@ -19,8 +20,8 @@ const Contents= {
         Counter: 'counter'
     },
     Number: {
-        SourceHaversterMax: 3,
-        HaversterNeeded: 6,
+        SourceHaversterMax: 2,
+        HaversterNeeded: 4,
         UpgraderNeeded: 3
     }
 }

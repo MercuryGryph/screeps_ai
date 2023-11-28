@@ -1,5 +1,5 @@
 const Contents = require('contents');
-const RoleCommom = require('role.common');
+const RoleCommon = require('role.common');
 
 const roleHaverster = {
 
@@ -9,7 +9,7 @@ run: function (creep) {
     if (creep.store.getFreeCapacity() > 0) {
 
         if (!creep.memory[Contents.CreepMemory.WorkTarget] ||
-            Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget]).energy === 0) {
+            RoleCommon.isTargetEmpty(creep, RESOURCE_ENERGY)) {
             const sources = creep.room.find(FIND_SOURCES);
 
             for (const source of sources) {
@@ -18,18 +18,21 @@ run: function (creep) {
 
                 if (source.energy > 0 && numHaverster < Contents.Number.SourceHaversterMax) {
                     creep.memory[Contents.CreepMemory.WorkTarget] = source.id;
+                    creep.memory[Contents.CreepMemory.WorkTargetType] = FIND_SOURCES;
                     break;
                 }
             }
         }
 
-        RoleCommom.harvestTarget(creep);
+        RoleCommon.getEnergyFromTarget(creep);
 
     } else {
-        if (RoleCommom.transEnergyToSpawn(creep)) {
-            // return
+        if (RoleCommon.transEnergyToSpawn(creep)) {
+            return;
         }
-        // 其他可行的工作
+        if (RoleCommon.transEnergyToContainer(creep)) {
+            // return;
+        }
     }
 
 }
