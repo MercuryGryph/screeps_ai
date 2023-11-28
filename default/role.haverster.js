@@ -28,11 +28,8 @@ run: function (creep) {
 
     } else {
         if (RoleCommon.transEnergyToSpawn(creep)) {
-            return;
-        }
-        if (RoleCommon.transEnergyToContainer(creep)) {
-            // return;
-        }
+        } else if (RoleCommon.transEnergyToContainer(creep)) {
+        } else RoleCommon.toUpgradeController(creep)
     }
 
 }

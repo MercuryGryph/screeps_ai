@@ -5,25 +5,22 @@ const roleUpgrader = {
 
 /** @param {Creep} creep */
 run: function (creep) {
+
     if (creep.store.getUsedCapacity() === 0) {
         creep.memory[Contents.CreepMemory.ShouldGetEnergy] = true;
-    }
-    if (creep.store.getFreeCapacity() === 0) {
+    } else if (creep.store.getFreeCapacity() === 0) {
         creep.memory[Contents.CreepMemory.ShouldGetEnergy] = false;
     }
 
     if (creep.memory[Contents.CreepMemory.ShouldGetEnergy]) {
+        creep.memory[Contents.CreepMemory.WorkTargetType] = undefined;
 
         if (!creep.memory[Contents.CreepMemory.WorkTarget] ||
-            Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget])
-                .energy === 0
-            // ||
-            // Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget])
-            //     .store.getUsedCapacity(RESOURCE_ENERGY) === 0
-            ) {
+            RoleCommon.isTargetEmpty(creep, RESOURCE_ENERGY)
+        ) {
             if (RoleCommon.setTargetAtContainer(creep)) {
             } else if (RoleCommon.setTargetAtSource(creep)) {
-            }
+            } // else if ...
         }
 
         RoleCommon.getEnergyFromTarget(creep);
