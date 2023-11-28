@@ -13,7 +13,6 @@ run: function (creep) {
     }
 
     if (creep.memory[Contents.CreepMemory.ShouldGetEnergy]) {
-        creep.memory[Contents.CreepMemory.WorkTargetType] = undefined;
 
         if (!creep.memory[Contents.CreepMemory.WorkTarget] ||
             CreepCommon.isTargetEmpty(creep, RESOURCE_ENERGY)

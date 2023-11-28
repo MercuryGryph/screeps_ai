@@ -3,12 +3,15 @@
 const Contents = require("./contents");
 const creepCommon = {
 
-/** @param {Creep} creep */
-setTargetAtContainer: function (creep) {
+/** @param {Creep} creep
+ * @param {any} type RESOURCE_*
+ */
+setTargetAtContainer: function (creep, type = RESOURCE_ENERGY) {
 
     const targets = creep.room.find(FIND_STRUCTURES, {
         filter: (structure) => {
-            return (structure.structureType === STRUCTURE_CONTAINER)}});
+            return (structure.structureType === STRUCTURE_CONTAINER &&
+                    structure.store[type] > 0)}});
 
     if (targets.length === 0) {
         return false;
@@ -25,15 +28,18 @@ setTargetAtSource: function (creep) {
     const sources = creep.room.find(FIND_SOURCES, {
         filter: (source) => {
             return (source.energy > 0);}});
-    const flag = Game.flags[creep.room.name + Contents.FlagRole.Counter];
-    const numHaverster = flag.memory[sources[0].id];
 
-    if (sources.length === 0 || numHaverster >= Contents.Number.SourceHaversterMax) {
-        return false;
+    for (const source of sources) {
+        const numHaverster = Game.flags[creep.room.name + Contents.FlagRole.Counter].memory[source.id];
+
+        if (numHaverster < Contents.Number.SourceHaversterMax) {
+            creep.memory[Contents.CreepMemory.WorkTarget] = source.id;
+            creep.memory[Contents.CreepMemory.WorkTargetType] = FIND_SOURCES;
+            Game.flags[creep.room.name + Contents.FlagRole.Counter].memory[source.id] += 1;
+            return true
+        }
     }
-    creep.memory[Contents.CreepMemory.WorkTarget] = sources[0].id;
-    creep.memory[Contents.CreepMemory.WorkTargetType] = FIND_SOURCES;
-    return true;
+    return false;
 },
 
 /** @param {Creep} creep

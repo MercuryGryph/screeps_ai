@@ -15,19 +15,9 @@ run: function (creep) {
     if (creep.memory[Contents.CreepMemory.ShouldGetEnergy]) {
 
         if (!creep.memory[Contents.CreepMemory.WorkTarget] ||
-            CreepCommon.isTargetEmpty(creep, RESOURCE_ENERGY)) {
-            const sources = creep.room.find(FIND_SOURCES);
-
-            for (const source of sources) {
-                const flag = Game.flags[creep.room.name + Contents.FlagRole.Counter];
-                const numHaverster = flag.memory[source.id];
-
-                if (source.energy > 0 && numHaverster < Contents.Number.SourceHaversterMax) {
-                    creep.memory[Contents.CreepMemory.WorkTarget] = source.id;
-                    creep.memory[Contents.CreepMemory.WorkTargetType] = FIND_SOURCES;
-                    break;
-                }
-            }
+            CreepCommon.isTargetEmpty(creep, RESOURCE_ENERGY)
+        ) {
+            CreepCommon.setTargetAtSource(creep);
         }
 
         CreepCommon.getEnergyFromTarget(creep);

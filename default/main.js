@@ -3,9 +3,10 @@ const creepHarvester = require('creep.haverster')
 const creepUpgrader = require('creep.upgrader')
 const creepBuilder = require('creep.builder')
 
-const BasicCreepBody = [WORK, CARRY, MOVE, MOVE];
-const Creep3W1C2M = [WORK, WORK, WORK, CARRY, MOVE];
+const BasicCreepBody = [WORK, CARRY, MOVE, MOVE]; // cost: 300
+const Creep3W1C2M = [WORK, WORK, WORK, CARRY, MOVE, MOVE]; // cost: 500
 
+let CreepBody = Creep3W1C2M;
 let HarvesterBody = BasicCreepBody;
 
 const MainSpawn = Game.spawns['spawner_1'];
@@ -79,7 +80,7 @@ function keepCreepNumber(spawn, type, role, number) {
         console.log(
             Game.time + ' | ' + spawn.room.name +
             '\t | number of ' + role +
-            ' is ' + creepsNum);
+            ' is ' + creepsNum + ' / ' + number);
         console.log(
             Game.time + ' | ' + spawn.room.name +
             '\t | spawn ' + spawn.name +
@@ -114,7 +115,7 @@ function showInfo() {
 /** @param {StructureSpawn} spawn */
 function arrangeWork(spawn) {
     for (const creep of spawn.room.find(FIND_MY_CREEPS)) {
-        updateFlagMemory(spawn);
+        // updateFlagMemory(spawn);
         switch (creep.memory[Contents.CreepMemory.Role]) {
             case Contents.CreepRole.Harvester:
                 creepHarvester.run(creep);
@@ -143,17 +144,17 @@ module.exports.loop = function () {
     for (const spawn of _.filter(Game.spawns)) {
 
         keepCreepNumber(spawn,
-            BasicCreepBody,
+            CreepBody,
             Contents.CreepRole.Upgrader,
             Contents.Number.UpgraderNeeded);
 
         keepCreepNumber(spawn,
-            HarvesterBody,
+            CreepBody,
             Contents.CreepRole.Harvester,
             Contents.Number.HaversterNeeded);
 
         keepCreepNumber(spawn,
-            BasicCreepBody,
+            CreepBody,
             Contents.CreepRole.Builder,
             Contents.Number.BuilderNeeded)
     }
