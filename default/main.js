@@ -4,9 +4,9 @@ const creepUpgrader = require('creep.upgrader')
 const creepBuilder = require('creep.builder')
 
 const BasicCreepBody = [WORK, CARRY, MOVE, MOVE]; // cost: 300
-const Creep3W1C2M = [WORK, WORK, WORK, CARRY, MOVE, MOVE]; // cost: 500
+const Creep3W2C3M = [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE]; // cost: 550
 
-let CreepBody = Creep3W1C2M;
+let CreepBody = Creep3W2C3M;
 let HarvesterBody = BasicCreepBody;
 
 const MainSpawn = Game.spawns['spawner_1'];
@@ -29,8 +29,8 @@ function updateFlagMemory(spawn, showInfo = false) {
     for (const source of spawn.room.find(FIND_SOURCES)) {
         flag.memory[source.id] =
             spawn.room.find(FIND_MY_CREEPS, {
-                filter: (creep) => {
-                    return (creep.memory[Contents.CreepMemory.WorkTarget] === source.id)}}
+                filter: (creep) => {return (
+                    creep.memory[Contents.CreepMemory.WorkTarget] === source.id)}}
             ).length;
 
         if (showInfo) {

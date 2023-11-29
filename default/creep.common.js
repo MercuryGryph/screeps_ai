@@ -9,9 +9,9 @@ const creepCommon = {
 setTargetAtContainer: function (creep, type = RESOURCE_ENERGY) {
 
     const targets = creep.room.find(FIND_STRUCTURES, {
-        filter: (structure) => {
-            return (structure.structureType === STRUCTURE_CONTAINER &&
-                    structure.store[type] > 0)}});
+        filter: (structure) => {return (
+            structure.structureType === STRUCTURE_CONTAINER &&
+            structure.store[type] > 0)}});
 
     if (targets.length === 0) {
         return false;
@@ -26,8 +26,8 @@ setTargetAtContainer: function (creep, type = RESOURCE_ENERGY) {
 setTargetAtSource: function (creep) {
 
     const sources = creep.room.find(FIND_SOURCES, {
-        filter: (source) => {
-            return (source.energy > 0);}});
+        filter: (source) => {return (
+            source.energy > 0)}});
 
     for (const source of sources) {
         const numHaverster = Game.flags[creep.room.name + Contents.FlagRole.Counter].memory[source.id];
@@ -94,10 +94,10 @@ getEnergyFromTarget: function (creep, type = RESOURCE_ENERGY) {
 transEnergyToSpawn: function (creep) {
 
     const targets = creep.room.find(FIND_MY_STRUCTURES, {
-        filter: (structure) => {
-            return (structure.structureType === STRUCTURE_SPAWN ||
-                    structure.structureType === STRUCTURE_EXTENSION) &&
-                structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;}});
+        filter: (structure) => {return (
+            structure.structureType === STRUCTURE_SPAWN ||
+                structure.structureType === STRUCTURE_EXTENSION) &&
+            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;}});
 
     if (targets.length === 0) {
         return false;
@@ -117,8 +117,9 @@ transEnergyToContainer: function (creep) {
     }
 
     const targets = creep.room.find(FIND_STRUCTURES, {
-        filter: (structure) => {
-            return structure.structureType === STRUCTURE_CONTAINER}});
+        filter: (structure) => {return (
+            structure.structureType === STRUCTURE_CONTAINER &&
+            structure.store.getFreeCapacity() > 0)}});
 
     if (targets.length > 0) {
         if (creep.transfer(targets[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
