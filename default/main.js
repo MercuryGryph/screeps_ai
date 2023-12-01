@@ -13,10 +13,13 @@ const MainSpawn = Game.spawns['spawner_1'];
 let RoomMainSpawnList = [MainSpawn]
 
 /**
+ * 更新 ***spawn*** 所在 *room* 的 *flag* 的 *memory*
  * @param {StructureSpawn} spawn
- * @param {boolean} showInfo
+ * @param {boolean} showInfo 是否在地图上打印信息
  */
 function updateFlagMemory(spawn, showInfo = false) {
+
+    // 如果不存在 flag, 创建
     if (!Game.flags[spawn.room.name + Contents.FlagRole.Counter]) {
         spawn.room.createFlag(
             spawn.pos.x + 1,
@@ -24,15 +27,20 @@ function updateFlagMemory(spawn, showInfo = false) {
             spawn.room.name + Contents.FlagRole.Counter
         );
     }
+
     const flag = Game.flags[spawn.room.name + Contents.FlagRole.Counter];
 
+    // 与 Source 相关信息
     for (const source of spawn.room.find(FIND_SOURCES)) {
+
+        // 要从 source 采集能量的 creep 的 数量
         flag.memory[source.id] =
             spawn.room.find(FIND_MY_CREEPS, {
                 filter: (creep) => {return (
                     creep.memory[Contents.CreepMemory.WorkTarget] === source.id)}}
             ).length;
 
+        // 在地图上显示
         if (showInfo) {
             source.room.visual.text(
                 flag.memory[source.id] + ' | ' + source.energy,
@@ -43,6 +51,9 @@ function updateFlagMemory(spawn, showInfo = false) {
     }
 }
 
+/**
+ * 清除无效的 *creep* (和 *spawn*?)
+ */
 function cleanMemory() {
 
     for (const name in Memory.creeps) {
@@ -58,18 +69,21 @@ function cleanMemory() {
 }
 
 /**
- * @param {StructureSpawn} spawn
- * @param {BodyPartConstant[]} type
- * @param {Role} role
- * @param {number} number
+ * 当拥有对应 ***role*** 的 *creep* 现有数量小于 ***number*** 时，让 ***spawn*** 生成新的 *creep*
+ * @param {StructureSpawn} spawn spawn
+ * @param {BodyPartConstant[]} body 身体部件
+ * @param {Role} role creep 的身份
+ * @param {number} number 数量
  */
-function keepCreepNumber(spawn, type, role, number) {
+function keepCreepNumber(spawn, body, role, number) {
 
+    // 统计 creep 数量
     const creepsNum =
         spawn.room.find(FIND_MY_CREEPS, {
             filter: (creep) => {return (
                 creep.memory[Contents.CreepMemory.Role] === role)}}
         ).length +
+        // 加上正在生成的
         spawn.room.find(FIND_MY_SPAWNS, {
             filter: (s) => {return (
                 s.spawning !== null &&
@@ -89,15 +103,20 @@ function keepCreepNumber(spawn, type, role, number) {
         const Memory = {memory: {}};
         Memory.memory[Contents.CreepMemory.Role] = role;
         spawn.spawnCreep(
-            type,
+            body,
             role + '-' + spawn.name + '-' + Game.time,
             Memory)
         spawn.memory[Contents.SpawnMemory.SpawningRole] = role;
     }
 }
 
+/**
+ * 在地图上打印信息:
+ * - *spawn* 正在生成的 *creep* 的 *role*
+ */
 function showInfo() {
     for (const spawn of _.filter(Game.spawns)) {
+        // spawn 正在生成的 creep 的 身份
         if (spawn.spawning) {
             const spawningTarget = Game
                 .creeps[spawn.spawning.name]
@@ -112,10 +131,13 @@ function showInfo() {
     }
 }
 
-/** @param {StructureSpawn} spawn */
+/**
+ * 为 ***spawn*** 所在 *room* 的所有 *creep* 安排与身份符合的工作
+ * @param {StructureSpawn} spawn
+ */
 function arrangeWork(spawn) {
     for (const creep of spawn.room.find(FIND_MY_CREEPS)) {
-        // updateFlagMemory(spawn);
+
         switch (creep.memory[Contents.CreepMemory.Role]) {
             case Contents.CreepRole.Harvester:
                 creepHarvester.run(creep);

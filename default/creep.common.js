@@ -1,17 +1,20 @@
-// const Contents = require('contents');
+const Contents = require('contents');
 
-const Contents = require("./contents");
 const creepCommon = {
 
-/** @param {Creep} creep
- * @param {any} type RESOURCE_*
+/**
+ * 将 ***creep*** 的目标设置为存有 ***resource_type*** 资源的 *Container*
+ * @param {Creep} creep
+ * @param {any} resource_type RESOURCE_*
+ *
+ * @return {boolean} 是否正确工作
  */
-setTargetAtContainer: function (creep, type = RESOURCE_ENERGY) {
+setTargetAtContainer: function (creep, resource_type = RESOURCE_ENERGY) {
 
     const targets = creep.room.find(FIND_STRUCTURES, {
         filter: (structure) => {return (
             structure.structureType === STRUCTURE_CONTAINER &&
-            structure.store[type] > 0)}});
+            structure.store[resource_type] > 0)}});
 
     if (targets.length === 0) {
         return false;
@@ -22,7 +25,12 @@ setTargetAtContainer: function (creep, type = RESOURCE_ENERGY) {
 
 },
 
-/** @param {Creep} creep */
+/**
+ * 将 ***creep*** 的目标设置为非空且 *Creep* 数量未到上限的 *Source*
+ * @param {Creep} creep
+ *
+ * @return {boolean} 是否正确工作
+ */
 setTargetAtSource: function (creep) {
 
     const sources = creep.room.find(FIND_SOURCES, {
@@ -35,6 +43,7 @@ setTargetAtSource: function (creep) {
         if (numHaverster < Contents.Number.SourceHaversterMax) {
             creep.memory[Contents.CreepMemory.WorkTarget] = source.id;
             creep.memory[Contents.CreepMemory.WorkTargetType] = FIND_SOURCES;
+            // 更新 flag 记录的数量
             Game.flags[creep.room.name + Contents.FlagRole.Counter].memory[source.id] += 1;
             return true
         }
@@ -42,19 +51,23 @@ setTargetAtSource: function (creep) {
     return false;
 },
 
-/** @param {Creep} creep
- * @param {any} type RESOURCE_*
+/**
+ * 检查 ***creep*** 的目标是否还有 ***resource_type*** 资源剩余
+ * @param {Creep} creep
+ * @param {any} resource_type RESOURCE_*
+ *
+ * @return {boolean} 是否目标没有该种类资源
  */
-isTargetEmpty: function (creep, type) {
+isTargetEmpty: function (creep, resource_type = RESOURCE_ENERGY) {
 
     const target = Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget]);
 
     switch (creep.memory[Contents.CreepMemory.WorkTargetType]) {
         case FIND_SOURCES:
-            if (type !== RESOURCE_ENERGY) return true;
+            if (resource_type !== RESOURCE_ENERGY) return true;
             return (target.energy === 0);
         case STRUCTURE_CONTAINER:
-            return (target.store[type] === 0);
+            return (target.store[resource_type] === 0);
         default:
             creep.memory[Contents.CreepMemory.WorkTarget] = undefined;
             creep.memory[Contents.CreepMemory.WorkTargetType] = undefined;
@@ -62,16 +75,19 @@ isTargetEmpty: function (creep, type) {
     }
 },
 
-/** @param {Creep} creep
- * @param {any} type RESOURCE_*
+/**
+ * 让 ***creep*** 从目标获取 ***resource_type*** 资源
+ * @param {Creep} creep
+ * @param {any} resource_type RESOURCE_*
+ *
+ * @return {boolean} 是否正确工作
  */
-getEnergyFromTarget: function (creep, type = RESOURCE_ENERGY) {
+getEnergyFromTarget: function (creep, resource_type = RESOURCE_ENERGY) {
 
     const target = Game.getObjectById(creep.memory[Contents.CreepMemory.WorkTarget]);
-
     switch (creep.memory[Contents.CreepMemory.WorkTargetType]) {
         case STRUCTURE_CONTAINER:
-            if (creep.withdraw(target, type) === ERR_NOT_IN_RANGE) {
+            if (creep.withdraw(target, resource_type) === ERR_NOT_IN_RANGE) {
                 creep.moveTo(target, {
                 visualizePathStyle: {stroke: '#ffaa00'}});
             }
@@ -90,7 +106,14 @@ getEnergyFromTarget: function (creep, type = RESOURCE_ENERGY) {
 
 // works can do
 
-/** @param {Creep} creep */
+/**
+ * *Creep* 的工作
+ *
+ * 让 ***creep*** 将能量运输到 *Spawn* 和 *Extension*
+ * @param {Creep} creep
+ *
+ * @return {boolean} 是否正确工作
+ */
 transEnergyToSpawn: function (creep) {
 
     const targets = creep.room.find(FIND_MY_STRUCTURES, {
@@ -109,7 +132,14 @@ transEnergyToSpawn: function (creep) {
     return true;
 },
 
-/** @param {Creep} creep */
+/**
+ * *Creep* 的工作
+ *
+ * 让 ***creep*** 将能量运输到 *Container*
+ * @param {Creep} creep
+ *
+ * @return {boolean} 是否正确工作
+ */
 transEnergyToContainer: function (creep) {
 
     if (creep.memory[Contents.CreepMemory.WorkTargetType] === STRUCTURE_CONTAINER) {
@@ -132,7 +162,12 @@ transEnergyToContainer: function (creep) {
     }
 },
 
-/** @param {Creep} creep */
+/**
+ * *Creep* 的工作
+ *
+ * 让 ***creep*** 去升级 *Controller*
+ * @param {Creep} creep
+ */
 toUpgradeController: function (creep) {
 
     if (creep.upgradeController(creep.room.controller) === ERR_NOT_IN_RANGE) {
@@ -141,7 +176,14 @@ toUpgradeController: function (creep) {
     }
 },
 
-/** @param {Creep} creep */
+/**
+ * *Creep* 的工作
+ *
+ * 让 ***creep*** 去建造建筑
+ * @param {Creep} creep
+ *
+ * @return {boolean} 是否正确工作
+ */
 toBuildConstruction: function (creep) {
 
     if (creep.memory[Contents.CreepMemory.WorkTargetType] !== FIND_MY_CONSTRUCTION_SITES) {
@@ -157,10 +199,9 @@ toBuildConstruction: function (creep) {
     if (target == null) {   // 过程中目标已被完成
         creep.memory[Contents.CreepMemory.WorkTarget] = undefined;
         creep.memory[Contents.CreepMemory.WorkTargetType] = undefined;
-    }
-    if (creep.build(target) === ERR_NOT_IN_RANGE) {
+    } else if (creep.build(target) === ERR_NOT_IN_RANGE) {
         creep.moveTo(target, {
-                visualizePathStyle: {stroke: '#2266ff'}});
+            visualizePathStyle: {stroke: '#2266ff'}})
     }
     return true;
 }

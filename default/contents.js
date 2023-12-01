@@ -20,7 +20,7 @@ const Contents= {
         Counter: 'counter'
     },
     Number: {
-        SourceHaversterMax: 5,
+        SourceHaversterMax: 4,
         HaversterNeeded: 6,
         UpgraderNeeded: 2,
         BuilderNeeded: 4
