@@ -89,7 +89,7 @@ getEnergyFromTarget: function (creep, resource_type = RESOURCE_ENERGY) {
         case STRUCTURE_CONTAINER:
             if (creep.withdraw(target, resource_type) === ERR_NOT_IN_RANGE) {
                 creep.moveTo(target, {
-                visualizePathStyle: {stroke: '#ffaa00'}});
+                    visualizePathStyle: {stroke: '#ffaa00'}});
             }
             break;
         case FIND_SOURCES:
